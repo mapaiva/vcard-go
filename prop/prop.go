@@ -1,4 +1,4 @@
-// Vcard properties based on version 4
+// Package prop contains all vCard properties based on version 4
 package prop
 
 const (
@@ -20,7 +20,6 @@ const (
 	FN           = "FN"
 	GENDER       = "GENDER"
 	GEO          = "GEO"
-	IMPP         = "IMPP"
 	KEY          = "KEY"
 	KIND         = "KIND"
 	LANG         = "LANG"
@@ -38,7 +37,6 @@ const (
 	RELATED      = "RELATED"
 	REV          = "REV"
 	ROLE         = "ROLE"
-	SORT_STRING  = "SORT-STRING"
 	SOUND        = "SOUND"
 	SOURCE       = "SOURCE"
 	TEL          = "TEL"
@@ -48,4 +46,14 @@ const (
 	URL          = "URL"
 	VERSION      = "VERSION"
 	XML          = "XML"
+
+	// Additional properties
+	BIRTHPLACE    = "BIRTHPLACE"
+	DEATHPLACE    = "DEATHPLACE"
+	DEATHDATE     = "DEATHDATE"
+	EXPERTISE     = "EXPERTISE"
+	HOBBY         = "HOBBY"
+	IMPP          = "IMPP"
+	INTEREST      = "INTEREST"
+	ORG_DIRECTORY = "ORG-DIRECTORY"
 )
