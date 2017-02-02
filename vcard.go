@@ -5,62 +5,69 @@ package vcard
 import (
 	"bufio"
 	"os"
+	"reflect"
 	"strings"
 
 	"github.com/mapaiva/vcard-go/prop"
 )
 
-// Vcard represents a single vCard with its fields.
+const (
+	// VCardTagName represents the tag name used inside
+	// the struct VCard.
+	VCardTagName = "vcard"
+)
+
+// VCard represents a single vCard with its fields.
 type VCard struct {
-	StructuredName  string // N
-	FormattedName   string // FN
-	Email           string // EMAIL
-	Version         string // VERSION
-	Addr            string // ADR
-	Anniversay      string // ANNIVERSARY
-	BirthDay        string // BDAY
-	Nickname        string // NICKNAME
-	Photo           string // PHOTO
-	CalendarAddrURI string // CALADRURI
-	CalendarURI     string // CALURI
-	Categories      string // CATEGORIES
-	Class           string // CLASS
-	ClientIDMap     string // CLIENTIDMAP
-	FreeOrBusyURL   string // FBURL
-	Gender          string // GENDER
-	Geolocation     string // GEO
-	Key             string // KEY
-	Kind            string // KIND
-	Language        string // LANG
-	Logo            string // LOGO
-	Mailer          string // MAILER
-	Member          string // MEMBER
-	Name            string // NAME
-	Note            string // NOTE
-	Organization    string // ORG
-	ProdID          string // PRODID
-	Profile         string // PROFILE
-	Related         string // RELATED
-	Revision        string // REV
-	Role            string // ROLE
-	Sound           string // SOUND
-	Source          string // SOURCE
-	Phone           string // TEL
-	Title           string // TITLE
-	TimeZone        string // TZ
-	UID             string // UID
-	URL             string // URL
-	XML             string // XML
+	StructuredName  string `vcard:"N"`
+	FormattedName   string `vcard:"FN"`
+	Email           string `vcard:"EMAIL"`
+	Version         string `vcard:"VERSION"`
+	Addr            string `vcard:"ADR"`
+	Anniversay      string `vcard:"ANNIVERSARY"`
+	BirthDay        string `vcard:"BDAY"`
+	Nickname        string `vcard:"NICKNAME"`
+	Photo           string `vcard:"PHOTO"`
+	CalendarAddrURI string `vcard:"CALADRURI"`
+	CalendarURI     string `vcard:"CALURI"`
+	Categories      string `vcard:"CATEGORIES"`
+	Class           string `vcard:"CLASS"`
+	ClientIDMap     string `vcard:"CLIENTIDMAP"`
+	FreeOrBusyURL   string `vcard:"FBURL"`
+	Gender          string `vcard:"GENDER"`
+	Geolocation     string `vcard:"GEO"`
+	Key             string `vcard:"KEY"`
+	Kind            string `vcard:"KIND"`
+	Language        string `vcard:"LANG"`
+	Logo            string `vcard:"LOGO"`
+	Mailer          string `vcard:"MAILER"`
+	Member          string `vcard:"MEMBER"`
+	Name            string `vcard:"NAME"`
+	Note            string `vcard:"NOTE"`
+	Organization    string `vcard:"ORG"`
+	ProdID          string `vcard:"PRODID"`
+	Profile         string `vcard:"PROFILE"`
+	Related         string `vcard:"RELATED"`
+	Revision        string `vcard:"REV"`
+	Role            string `vcard:"ROLE"`
+	Sound           string `vcard:"SOUND"`
+	Source          string `vcard:"SOURCE"`
+	Phone           string `vcard:"TEL"`
+	Title           string `vcard:"TITLE"`
+	TimeZone        string `vcard:"TZ"`
+	UID             string `vcard:"UID"`
+	URL             string `vcard:"URL"`
+	XML             string `vcard:"XML"`
 
 	// Additional properties
-	BirthPlace            string // BIRTHPLACE
-	DeathPlace            string // DEATHPLACE
-	DeathDate             string // DEATHDATE
-	Expertise             string // EXPERTISE
-	Hobby                 string // HOBBY
-	InstantMessenger      string // IMPP
-	Interest              string // INTEREST
-	OrganizationDirectory string // ORG-DIRECTORY
+	BirthPlace            string `vcard:"BIRTHPLACE"`
+	DeathPlace            string `vcard:"DEATHPLACE"`
+	DeathDate             string `vcard:"DEATHDATE"`
+	Expertise             string `vcard:"EXPERTISE"`
+	Hobby                 string `vcard:"HOBBY"`
+	InstantMessenger      string `vcard:"IMPP"`
+	Interest              string `vcard:"INTEREST"`
+	OrganizationDirectory string `vcard:"ORG-DIRECTORY"`
 }
 
 // GetVCards returns a list of vCard based on a file path.
@@ -90,7 +97,6 @@ func GetVCardsByFile(f *os.File) ([]VCard, error) {
 		case prop.START_PROP:
 			vc = new(VCard)
 		case prop.END_PROP:
-
 			if strings.TrimSpace(vc.FormattedName) != "" && strings.TrimSpace(vc.Version) != "" {
 				vcList = append(vcList, *vc)
 			}
@@ -99,44 +105,40 @@ func GetVCardsByFile(f *os.File) ([]VCard, error) {
 		}
 
 		if vc != nil {
-			vc = getVCFEntry(*vc, line)
+			vc = getVCFEntry(vc, line)
 		}
 	}
 
 	return vcList, nil
 }
 
-func getVCFEntry(vc VCard, buff string) *VCard {
-	newVc := new(VCard)
-	newVc.Email = vc.Email
-	newVc.StructuredName = vc.StructuredName
-	newVc.Phone = vc.Phone
-	newVc.FormattedName = vc.FormattedName
-	newVc.Version = vc.Version
+func getVCFEntry(vc *VCard, buff string) *VCard {
+	if buff == prop.START_PROP || buff == prop.END_PROP {
+		return vc
+	}
 
+	newVc := new(VCard)
+	newVc = vc
 	key, value := splitKeyValueVCF(buff)
 
-	switch key {
-	case prop.N:
-		newVc.StructuredName = value
-	case prop.FN:
-		newVc.FormattedName = value
-	case prop.TEL:
-		newVc.Phone = value
-	case prop.EMAIL:
-		newVc.Email = value
-	case prop.VERSION:
-		newVc.Version = value
-	case prop.ADR:
-		newVc.Addr = value
-	case prop.ANNIVERSARY:
-		newVc.Anniversay = value
-	case prop.BDAY:
-		newVc.BirthDay = value
-	case prop.NICKNAME:
-		newVc.Nickname = value
-	case prop.PHOTO:
-		newVc.Photo = value
+	v := reflect.ValueOf(newVc).Elem()
+
+	for i := 0; i < v.NumField(); i++ {
+		f := v.Field(i)
+		if f.Kind() == reflect.Struct {
+			continue // No non string field is supported yet
+		}
+
+		sf := v.Type().Field(i)
+		tag := sf.Tag.Get(VCardTagName)
+		if tag == key && f.CanSet() {
+			switch f.Kind() {
+			case reflect.String:
+				f.SetString(value)
+			}
+
+			break
+		}
 	}
 
 	return newVc
