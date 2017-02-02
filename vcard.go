@@ -119,7 +119,7 @@ func getVCFEntry(vc *VCard, buff string) *VCard {
 
 	newVc := new(VCard)
 	newVc = vc
-	key, value := splitKeyValueVCF(buff)
+	key, value, _ := splitKeyValueVCF(buff)
 
 	v := reflect.ValueOf(newVc).Elem()
 
@@ -144,16 +144,35 @@ func getVCFEntry(vc *VCard, buff string) *VCard {
 	return newVc
 }
 
-func splitKeyValueVCF(buff string) (key, value string) {
+func splitKeyValueVCF(buff string) (string, string, map[string][]string) {
 	splitedBuff := strings.Split(buff, ":")
 	sbLen := len(splitedBuff)
+	key, _ := splitPropParams(splitedBuff[0])
 	if sbLen > 1 {
-		return splitedBuff[0], splitedBuff[1]
+		val := splitedBuff[1]
+
+		return key, val, nil
 	}
 
 	if sbLen == 1 {
-		return splitedBuff[0], ""
+		return key, "", nil
 	}
 
-	return "", ""
+	return "", "", nil
+}
+
+func splitPropParams(p string) (string, map[string][]string) {
+	splitProp := strings.Split(p, ";")
+	params := make(map[string][]string)
+	key := splitProp[0]
+	if len(splitProp) > 1 {
+		// TODO
+		//for i, prop := range splitProp[:1] {
+		//	if i%2 > 0 {
+
+		//	}
+		//}
+	}
+
+	return key, params
 }
