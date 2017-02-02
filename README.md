@@ -1,5 +1,5 @@
 # vcard-go
-A minimal library to manipulate VCard file using Golang
+A minimal library to manipulate VCard file using Golang. This library is based on [RFC6350](https://tools.ietf.org/html/rfc6350).
 
 ## Installation
 ```sh

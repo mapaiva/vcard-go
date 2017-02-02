@@ -120,9 +120,7 @@ func getVCFEntry(vc *VCard, buff string) *VCard {
 	newVc := new(VCard)
 	newVc = vc
 	key, value, _ := splitKeyValueVCF(buff)
-
 	v := reflect.ValueOf(newVc).Elem()
-
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)
 		if f.Kind() == reflect.Struct {
@@ -144,34 +142,36 @@ func getVCFEntry(vc *VCard, buff string) *VCard {
 	return newVc
 }
 
-func splitKeyValueVCF(buff string) (string, string, map[string][]string) {
+func splitKeyValueVCF(buff string) (string, string, map[string]string) {
 	splitedBuff := strings.Split(buff, ":")
 	sbLen := len(splitedBuff)
-	key, _ := splitPropParams(splitedBuff[0])
+	key, params := splitPropParams(splitedBuff[0])
 	if sbLen > 1 {
 		val := splitedBuff[1]
 
-		return key, val, nil
+		return key, val, params
 	}
 
-	if sbLen == 1 {
-		return key, "", nil
-	}
-
-	return "", "", nil
+	return key, "", params
 }
 
-func splitPropParams(p string) (string, map[string][]string) {
+func splitPropParams(p string) (string, map[string]string) {
 	splitProp := strings.Split(p, ";")
-	params := make(map[string][]string)
+	params := make(map[string]string)
 	key := splitProp[0]
 	if len(splitProp) > 1 {
-		// TODO
-		//for i, prop := range splitProp[:1] {
-		//	if i%2 > 0 {
+		for _, param := range splitProp[:1] {
+			// Parameter metadata
+			pmd := strings.Split(param, "=")
+			pk := pmd[0]
+			if len(pmd) > 1 {
+				params[pk] = pmd[1]
 
-		//	}
-		//}
+				continue
+			}
+
+			params[pk] = ""
+		}
 	}
 
 	return key, params
