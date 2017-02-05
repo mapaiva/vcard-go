@@ -25,3 +25,6 @@ func main() {
 	log.Println(cards)
 }
 ```
+## Documentation
+
+Complete documentation available on https://godoc.org/github.com/mapaiva/vcard-go.
