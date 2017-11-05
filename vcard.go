@@ -4,6 +4,7 @@ package vcard
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"reflect"
 	"strings"
@@ -85,9 +86,12 @@ func GetVCards(path string) ([]VCard, error) {
 func GetVCardsByFile(f *os.File) ([]VCard, error) {
 	// Close file when exit fn
 	defer f.Close()
+	return GetVCardsByReader(f)
+}
 
+func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 	vcList := make([]VCard, 0)
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(r)
 	vc := new(VCard)
 
 	for scanner.Scan() {
