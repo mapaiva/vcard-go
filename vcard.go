@@ -1,5 +1,4 @@
-// Package vcard is a library made to decode vCard files
-// into readable golang structs.
+// Package vcard is a library made to decode vCard files into readable golang structs.
 package vcard
 
 import (
@@ -13,8 +12,7 @@ import (
 )
 
 const (
-	// VCardTagName represents the tag name used inside
-	// the struct VCard.
+	// VCardTagName represents the tag name used inside the struct VCard.
 	VCardTagName = "vcard"
 )
 
@@ -81,14 +79,14 @@ func GetVCards(path string) ([]VCard, error) {
 	return GetVCardsByFile(f)
 }
 
-// GetVCardsByFile returns a list of vCard retrived
-// from a golang *os.File.
+// GetVCardsByFile returns a list of vCard retrived from a golang *os.File.
 func GetVCardsByFile(f *os.File) ([]VCard, error) {
 	// Close file when exit fn
 	defer f.Close()
 	return GetVCardsByReader(f)
 }
 
+// GetVCardsByReader returns a list of vCards given an io.Reader.
 func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 	vcList := make([]VCard, 0)
 	scanner := bufio.NewScanner(r)
@@ -98,9 +96,9 @@ func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 		line := scanner.Text()
 
 		switch line {
-		case prop.START_PROP:
+		case prop.Begin:
 			vc = new(VCard)
-		case prop.END_PROP:
+		case prop.End:
 			if strings.TrimSpace(vc.FormattedName) != "" && strings.TrimSpace(vc.Version) != "" {
 				vcList = append(vcList, *vc)
 			}
@@ -117,7 +115,7 @@ func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 }
 
 func getVCFEntry(vc *VCard, buff string) *VCard {
-	if buff == prop.START_PROP || buff == prop.END_PROP {
+	if buff == prop.Begin || buff == prop.End {
 		return vc
 	}
 
