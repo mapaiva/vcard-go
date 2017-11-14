@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/mapaiva/vcard-go.svg?style=shield)](https://circleci.com/gh/mapaiva/vcard-go)
+
 # vcard-go
 A minimal library to manipulate VCard file using Golang. This library is based on [RFC6350](https://tools.ietf.org/html/rfc6350).
 
