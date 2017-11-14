@@ -13,6 +13,7 @@ jobs:
       - checkout
       - run: mkdir -p $TEST_RESULTS
       - run: go get github.com/jstemmer/go-junit-report
+      - run: go get github.com/golang/lint
       - run: 
           name: Run linter
           command: make lint
