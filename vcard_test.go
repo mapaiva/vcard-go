@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVcardsByReader(t *testing.T) {
+func TestVCardsByReader(t *testing.T) {
 	assert := assert.New(t)
 
 	t.Run("Test if it returns the expected fields given a valid reader", func(t *testing.T) {
