@@ -4,15 +4,10 @@ jobs:
     docker:
       - image: circleci/golang:1.9
 
-    environment:
-      - TEST_RESULTS: "/tmp/test-results"
-
     working_directory: /go/src/github.com/mapaiva/vcard-go
 
     steps:
       - checkout
-      - run: mkdir -p $TEST_RESULTS
-      - run: go get github.com/jstemmer/go-junit-report
       - run: go get -u github.com/golang/lint/golint
       - run: make install
       - run: 
@@ -20,8 +15,4 @@ jobs:
           command: make lint
       - run:
           name: Run unit tests
-          command: |
-            trap "go-junit-report </tmp/test-results/go-test.out > /tmp/test-results/go-test-report.xml" EXIT
-            make test | tee /tmp/test-results/go-test.out
-      - store_test_results:
-          path: /tmp/test-results
+          command: make test
