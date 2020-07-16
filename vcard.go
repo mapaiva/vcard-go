@@ -23,7 +23,7 @@ type VCard struct {
 	Email           string `vcard:"EMAIL"`
 	Version         string `vcard:"VERSION"`
 	Addr            string `vcard:"ADR"`
-	Anniversay      string `vcard:"ANNIVERSARY"`
+	Anniversary     string `vcard:"ANNIVERSARY"`
 	BirthDay        string `vcard:"BDAY"`
 	Nickname        string `vcard:"NICKNAME"`
 	Photo           string `vcard:"PHOTO"`
@@ -41,7 +41,7 @@ type VCard struct {
 	Logo            string `vcard:"LOGO"`
 	Mailer          string `vcard:"MAILER"`
 	Member          string `vcard:"MEMBER"`
-	Name            string `vcard:"NAME"`
+	Name            string `vcard:"NAME"` // No such field is defined in the RFC.
 	Note            string `vcard:"NOTE"`
 	Organization    string `vcard:"ORG"`
 	ProdID          string `vcard:"PRODID"`
