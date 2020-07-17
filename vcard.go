@@ -41,7 +41,6 @@ type VCard struct {
 	Logo            string `vcard:"LOGO"`
 	Mailer          string `vcard:"MAILER"`
 	Member          string `vcard:"MEMBER"`
-	Name            string `vcard:"NAME"` // No such field is defined in the RFC.
 	Note            string `vcard:"NOTE"`
 	Organization    string `vcard:"ORG"`
 	ProdID          string `vcard:"PRODID"`
