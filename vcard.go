@@ -72,7 +72,7 @@ type VCard struct {
 func GetVCards(path string) ([]VCard, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return make([]VCard, 0), err
+		return nil, err
 	}
 
 	return GetVCardsByFile(f)
@@ -89,7 +89,7 @@ func GetVCardsByFile(f *os.File) ([]VCard, error) {
 func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 	vcList := make([]VCard, 0)
 	scanner := bufio.NewScanner(r)
-	vc := new(VCard)
+	var vc *VCard
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -98,30 +98,27 @@ func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 		case prop.Begin:
 			vc = new(VCard)
 		case prop.End:
-			if strings.TrimSpace(vc.FormattedName) != "" && strings.TrimSpace(vc.Version) != "" {
+			if vc != nil && strings.TrimSpace(vc.FormattedName) != "" && strings.TrimSpace(vc.Version) != "" {
 				vcList = append(vcList, *vc)
 			}
-
-			vc = new(VCard)
-		}
-
-		if vc != nil {
-			vc = getVCFEntry(vc, line)
+		default:
+			// Any other kind of property: just read the property into *vc.
+			if vc != nil { // In case the file doesn't begin with a BEGIN.
+				readVCFProperty(vc, line)
+			}
 		}
 	}
 
 	return vcList, nil
 }
 
-func getVCFEntry(vc *VCard, buff string) *VCard {
-	if buff == prop.Begin || buff == prop.End {
-		return vc
+func readVCFProperty(vc *VCard, line string) {
+	if line == prop.Begin || line == prop.End || len(strings.Trim(line, " \t")) == 0 {
+		return
 	}
 
-	newVc := new(VCard)
-	newVc = vc
-	key, value, _ := splitKeyValueVCF(buff)
-	v := reflect.ValueOf(newVc).Elem()
+	key, value, _ := splitKeyValueVCF(line)
+	v := reflect.ValueOf(vc).Elem()
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Field(i)
 		if f.Kind() == reflect.Struct {
@@ -139,8 +136,6 @@ func getVCFEntry(vc *VCard, buff string) *VCard {
 			break
 		}
 	}
-
-	return newVc
 }
 
 func splitKeyValueVCF(buff string) (string, string, map[string]string) {
