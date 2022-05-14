@@ -1,3 +1,5 @@
+![build](https://github.com/mapaiva/vcard-go/actions/workflows/ci.yml/badge.svg)
+
 # vcard-go
 
 A minimal library to manipulate VCard file using Golang. This library is based on [RFC6350](https://tools.ietf.org/html/rfc6350).
