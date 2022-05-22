@@ -67,6 +67,24 @@ END:VCARD
 		assert.Equal(string(expected), string(card))
 	})
 
+	t.Run("Should marshal a struct pointer into a vcard record encoding", func(t *testing.T) {
+		expected := []byte(`BEGIN:VCARD
+VERSION:2.1
+N:Prefect;Ford;
+FN:Ford Prefect
+EMAIL:ford.per@hgog.glx
+END:VCARD
+`)
+		card, err := vcard.Marshal(&vCard{
+			StructuredName: "Prefect;Ford;",
+			FormattedName:  "Ford Prefect",
+			Email:          "ford.per@hgog.glx",
+		})
+
+		assert.Nil(err)
+		assert.Equal(string(expected), string(card))
+	})
+
 	t.Run("Should return error trying to marshal a slice", func(t *testing.T) {
 		_, err := vcard.Marshal([]vCard{
 			{

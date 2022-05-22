@@ -121,21 +121,19 @@ func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 func Marshal(v interface{}) ([]byte, error) {
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Struct:
-		return marshalStruct(v)
+		return marshalStruct(reflect.ValueOf(v))
+	case reflect.Ptr:
+		return marshalStruct(reflect.ValueOf(v).Elem())
 	}
 
 	return nil, ErrUnsupportedType
 }
 
-func marshalStruct(v interface{}) ([]byte, error) {
-	elem := reflect.ValueOf(v)
+func marshalStruct(elem reflect.Value) ([]byte, error) {
 	buffer := new(bytes.Buffer)
 
 	buffer.WriteString(prop.Begin + "\n")
-
-	buffer.WriteString(prop.Version)
-	buffer.WriteString(":")
-	buffer.WriteString(VCardVersion + "\n")
+	buffer.WriteString(fmt.Sprintf("%s:%s\n", prop.Version, VCardVersion))
 
 	for i := 0; i < elem.NumField(); i++ {
 		f := elem.Field(i)
@@ -147,9 +145,7 @@ func marshalStruct(v interface{}) ([]byte, error) {
 		tag := sf.Tag.Get(VCardTagName)
 		if tag != "" && f.CanInterface() {
 			if property, ok := prop.Props[tag]; ok {
-				buffer.WriteString(property)
-				buffer.WriteString(":")
-				buffer.WriteString(fmt.Sprintf("%s\n", f.Interface()))
+				buffer.WriteString(fmt.Sprintf("%s:%s\n", property, f.Interface()))
 			}
 		}
 	}
