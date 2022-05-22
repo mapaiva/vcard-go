@@ -3,6 +3,8 @@ package vcard
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"reflect"
@@ -14,6 +16,9 @@ import (
 const (
 	// VCardTagName represents the tag name used inside the struct VCard.
 	VCardTagName = "vcard"
+
+	// VCardVersion represents the supported version of vCard.
+	VCardVersion = "2.1"
 )
 
 // VCard represents a single vCard with its fields.
@@ -110,6 +115,48 @@ func GetVCardsByReader(r io.Reader) ([]VCard, error) {
 	}
 
 	return vcList, nil
+}
+
+// Marshal returns the vCard encoding of v.
+func Marshal(v interface{}) ([]byte, error) {
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Struct:
+		return marshalStruct(v)
+	}
+
+	return nil, ErrUnsupportedType
+}
+
+func marshalStruct(v interface{}) ([]byte, error) {
+	elem := reflect.ValueOf(v)
+	buffer := new(bytes.Buffer)
+
+	buffer.WriteString(prop.Begin + "\n")
+
+	buffer.WriteString(prop.Version)
+	buffer.WriteString(":")
+	buffer.WriteString(VCardVersion + "\n")
+
+	for i := 0; i < elem.NumField(); i++ {
+		f := elem.Field(i)
+		if f.Kind() != reflect.String {
+			continue // No non string field is supported yet
+		}
+
+		sf := elem.Type().Field(i)
+		tag := sf.Tag.Get(VCardTagName)
+		if tag != "" && f.CanInterface() {
+			if property, ok := prop.Props[tag]; ok {
+				buffer.WriteString(property)
+				buffer.WriteString(":")
+				buffer.WriteString(fmt.Sprintf("%s\n", f.Interface()))
+			}
+		}
+	}
+
+	buffer.WriteString(prop.End + "\n")
+
+	return buffer.Bytes(), nil
 }
 
 func readVCFProperty(vc *VCard, line string) {
